@@ -41,13 +41,40 @@ def cover_clopper(p):
         sys.exit()
     x = np.array(range(0, n))
     fpx = ss.binom.pmf(x, n, p)
-    foo = [ ss.binom_test(ix, n=n, p=p) for ix in x ]
+    #foo = [ ss.binom_test(ix, n=n, p=p) for ix in x ]
     #print(proportion_confint(np.array(range(0,n)), n, alpha=conf_level, method="beta"))
     #low = [ binomial_ci(ifoo, n, 1-conf_level) for ifoo in foo ]
     #hig = [ binomial_ci(ifoo, n, conf_level  ) for ifoo in foo ]
-    low = [ ss.beta.ppf(conf_level/2, ix, n-ix +1) for ix in x]
-    hig = [ ss.beta.isf(conf_level/2, ix+1, n-ix) for ix in x]
+    #low = [ ss.beta.ppf(conf_level/2, ix, n-ix +1) for ix in x]
+    #hig = [ ss.beta.ppf(1-conf_level/2, ix+1, n-ix) for ix in x]
+    low = [ (ss.beta.ppf((1-conf_level)/2, ix, n-ix+1)   )  if ix != 0 else 0 for ix in x]
+    hig = [ (ss.beta.ppf(1-(1-conf_level)/2, ix+1, n-ix ))  if ix != n else 1 for ix in x]
+
+    #    ## Determine p s.t. Prob(B(n,p) >= x) = alpha.
+    #    ## Use that for x > 0,
+    #    ##   Prob(B(n,p) >= x) = pbeta(p, x, n - x + 1).
+    #    p.L <- function(x, alpha) {
+    #        if(x == 0)                      # No solution
+    #            0
+    #        else
+    #            qbeta(alpha, x, n - x + 1)
+    #    }
+    #    ## Determine p s.t. Prob(B(n,p) <= x) = alpha.
+    #    ## Use that for x < n,
+    #    ##   Prob(B(n,p) <= x) = 1 - pbeta(p, x + 1, n - x).
+    #    p.U <- function(x, alpha) {
+    #        if(x == n)                      # No solution
+    #            1
+    #        else
+    #            qbeta(1 - alpha, x + 1, n - x)
+    #}
+
+    
+    print("______________", p, "_____________")
+    mything = [ (ilow, p, ihig) for ilow, ihig in zip_longest(low, hig) ]
+    print(mything)
     inies = [ int(ilow <= p and p <= ihig) for ilow, ihig in zip_longest(low, hig) ]
+    print(inies)
     return sum(inies * fpx)
 
 print(cover_clopper(0.6))
