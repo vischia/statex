@@ -24,7 +24,7 @@ dev.off()
 
 plot(lambda,thepdf(1, lambda),type='l',col='blue',xlab=expression(1/tau), ylab='Likelihood (a.u.)', main="Nuclear decay at time t=1", , lty=2, lwd=2)
 
-N<- c(..., ..., ..., ...)
+N<- c(1, 10, 100, 1000)
 
 for(n in N){
       logL<- 0
